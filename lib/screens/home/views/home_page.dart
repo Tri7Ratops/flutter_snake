@@ -7,6 +7,6 @@ class HomePage extends StatelessWidget {
       children: [
         Text("Hello World"),
       ],
-    )
+    );
   }
 }
