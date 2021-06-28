@@ -27,6 +27,7 @@ class SnakeGame extends StatefulWidget {
 }
 
 class _SnakeGameState extends State<SnakeGame> {
+
   @override
   Widget build(BuildContext context) {
     throw UnimplementedError();
