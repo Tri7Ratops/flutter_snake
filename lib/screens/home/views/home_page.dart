@@ -3,17 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 
 class HomePage extends StatelessWidget {
-  final int caseWidth = 10;
+  final int caseWidth = 25;
   final int numberCaseHorizontally = 10;
   final int numberCaseVertically = 10;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(
+          height: 16,
+        ),
         Text(
           "Snake game",
           style: Theme.of(context).textTheme.headline3,
+        ),
+        SizedBox(
+          height: 8,
         ),
         Text(
           "Parameters:",

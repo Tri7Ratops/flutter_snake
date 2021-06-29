@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_snake/widgets/snake/snake_board.dart';
+
+import 'snake_game_case.dart';
 
 class SnakeGame extends StatefulWidget {
   final int caseWidth;
@@ -15,8 +18,8 @@ class SnakeGame extends StatefulWidget {
     this.durationBetweenTicks = const Duration(seconds: 1),
     this.borderColor,
   }) : super(
-    key: key,
-  ) {
+          key: key,
+        ) {
     if (numberCaseVertically < 10 || numberCaseHorizontally < 10) {
       throw ("Error SnakeGame: numberCaseVertically and numberCaseHorizontally can't be inferior of 10");
     }
@@ -27,9 +30,26 @@ class SnakeGame extends StatefulWidget {
 }
 
 class _SnakeGameState extends State<SnakeGame> {
+  late final SnakeBoard _board;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _board = SnakeBoard(
+      context: context,
+      numberCaseHorizontally: widget.numberCaseHorizontally,
+      numberCaseVertically: widget.numberCaseVertically,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError();
+    return Container(
+      color: Colors.red,
+      width: (widget.caseWidth * widget.numberCaseHorizontally).toDouble(),
+      height: (widget.caseWidth * widget.numberCaseVertically).toDouble(),
+      child: Text("Hey !"),
+    );
   }
 }
