@@ -31,4 +31,22 @@ class SnakeBoard {
       y++;
     }
   }
+
+  SnakeGameCase? getCase(int y, int x) {
+    try {
+      return _board[y][x];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  List<SnakeGameCase>? getLine(int index) {
+    try {
+      return _board[index];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  List<List<SnakeGameCase>> get board => _board;
 }

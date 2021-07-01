@@ -4,20 +4,22 @@ import 'package:flutter_snake/widgets/snake/snake_board.dart';
 import 'snake_game_case.dart';
 
 class SnakeGame extends StatefulWidget {
-  final int caseWidth;
+  final double caseWidth;
   final int numberCaseHorizontally;
   final int numberCaseVertically;
   final Duration durationBetweenTicks;
-  final Color? borderColor;
+  final Color borderColor;
+  final Color backgroundColor;
 
-  SnakeGame({
-    Key? key,
-    required this.caseWidth,
-    required this.numberCaseHorizontally,
-    required this.numberCaseVertically,
-    this.durationBetweenTicks = const Duration(seconds: 1),
-    this.borderColor,
-  }) : super(
+  SnakeGame(
+      {Key? key,
+      required this.caseWidth,
+      required this.numberCaseHorizontally,
+      required this.numberCaseVertically,
+      this.durationBetweenTicks = const Duration(seconds: 1),
+      this.borderColor = Colors.black,
+      this.backgroundColor = Colors.grey})
+      : super(
           key: key,
         ) {
     if (numberCaseVertically < 10 || numberCaseHorizontally < 10) {
@@ -46,10 +48,42 @@ class _SnakeGameState extends State<SnakeGame> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.red,
-      width: (widget.caseWidth * widget.numberCaseHorizontally).toDouble(),
-      height: (widget.caseWidth * widget.numberCaseVertically).toDouble(),
-      child: Text("Hey !"),
+      color: widget.backgroundColor,
+      width: widget.caseWidth * widget.numberCaseHorizontally,
+      height: widget.caseWidth * widget.numberCaseVertically,
+      child: _printBoard(),
+    );
+  }
+
+  Column _printBoard() {
+    List<Widget> items = [];
+    int y = 0;
+    int x = 0;
+
+    while (_board.getLine(y) != null) {
+      List<Widget> tmp = [];
+      x = 0;
+      while (_board.getCase(y, x) != null) {
+        tmp.add(
+          Container(
+            width: widget.caseWidth,
+            height: widget.caseWidth,
+            color: Colors.orange,
+          ),
+        );
+        x++;
+      }
+      items.add(
+        Row(
+          children: tmp,
+        ),
+      );
+
+      y++;
+    }
+
+    return Column(
+      children: items,
     );
   }
 }

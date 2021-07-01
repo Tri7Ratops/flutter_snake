@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 
 class HomePage extends StatelessWidget {
-  final int caseWidth = 25;
+  final double caseWidth = 25.0;
   final int numberCaseHorizontally = 10;
   final int numberCaseVertically = 10;
 
