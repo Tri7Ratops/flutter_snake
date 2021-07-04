@@ -6,9 +6,18 @@ class HomePage extends StatelessWidget {
   final double caseWidth = 25.0;
   final int numberCaseHorizontally = 10;
   final int numberCaseVertically = 10;
+  SnakeGame? snakeGame;
 
   @override
   Widget build(BuildContext context) {
+    if (snakeGame == null) {
+      snakeGame = SnakeGame(
+        caseWidth: caseWidth,
+        numberCaseHorizontally: numberCaseHorizontally,
+        numberCaseVertically: numberCaseVertically,
+      );
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,11 +42,20 @@ class HomePage extends StatelessWidget {
         SizedBox(
           height: 32,
         ),
-        SnakeGame(
-          caseWidth: caseWidth,
-          numberCaseHorizontally: numberCaseHorizontally,
-          numberCaseVertically: numberCaseVertically,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () => snakeGame?.nextDirection = SNAKE_MOVE.left,
+              child: Text("LEFT"),
+            ),
+            TextButton(
+              onPressed: () => snakeGame?.nextDirection = SNAKE_MOVE.right,
+              child: Text("RIGHT"),
+            ),
+          ],
         ),
+        snakeGame ?? Text("Not initialized"),
       ],
     );
   }
