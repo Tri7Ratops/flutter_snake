@@ -79,6 +79,7 @@ class _SnakeGameState extends State<SnakeGame> {
     debugMove = "move $event";
     print("=== MOVE :");
     print("EVENT: $event");
+    _board?.moveSnake(event);
     setState(() {
 
     });
