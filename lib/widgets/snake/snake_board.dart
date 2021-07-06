@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'snake_game_case.dart';
+import 'package:flutter_snake/widgets/snake/snake.dart';
 
 class SnakeBoard {
-  List<List<SnakeGameCase>> _board = [];
+  List<List<CASE_TYPE>> _board = [];
 
   final BuildContext context;
   final int numberCaseHorizontally;
@@ -17,6 +16,10 @@ class SnakeBoard {
     _initBoard();
   }
 
+  moveSnake(SNAKE_MOVE move) {
+
+  }
+
   _initBoard() {
     int x = 0;
     int y = 0;
@@ -25,28 +28,28 @@ class SnakeBoard {
       x = 0;
       _board.add([]);
       while (x < this.numberCaseHorizontally) {
-        _board[y].add(SnakeGameCase());
+        _board[y].add(CASE_TYPE.empty);
         x++;
       }
       y++;
     }
   }
 
-  SnakeGameCase? getCase(int y, int x) {
+  CASE_TYPE getCase(int y, int x) {
     try {
       return _board[y][x];
     } catch (e) {
-      return null;
+      throw ("SNAKE BOARD: OUT OF THE BOARD");
     }
   }
 
-  List<SnakeGameCase>? getLine(int index) {
+  List<CASE_TYPE> getLine(int index) {
     try {
       return _board[index];
     } catch (e) {
-      return null;
+      throw ("SNAKE BOARD: OUT OF THE BOARD");
     }
   }
 
-  List<List<SnakeGameCase>> get board => _board;
+  List<List<CASE_TYPE>> get board => _board;
 }
