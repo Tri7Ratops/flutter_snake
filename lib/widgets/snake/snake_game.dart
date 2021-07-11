@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 import 'package:flutter_snake/widgets/snake/snake_board.dart';
+import 'package:flutter_snake/widgets/snake/utils/board_case.dart';
 
 class SnakeGame extends StatefulWidget {
   SNAKE_MOVE? _direction;
 
   set nextDirection(SNAKE_MOVE move) => _direction = move;
+
   SNAKE_MOVE get getDirection => _direction ?? SNAKE_MOVE.front;
 
   final double caseWidth;
@@ -46,6 +48,7 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   void initState() {
+    print("- INIT");
     super.initState();
 
     _board = SnakeBoard(
@@ -54,6 +57,7 @@ class _SnakeGameState extends State<SnakeGame> {
       numberCaseVertically: widget.numberCaseVertically,
     );
     if (controller == null) {
+      print("--- CONTROLLER SET");
       controller = StreamController<SNAKE_MOVE>();
     }
     controller?.stream.listen((value) {
@@ -71,6 +75,7 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   void dispose() {
+    print("- DISPOSE");
     timer?.cancel();
     super.dispose();
   }
@@ -80,9 +85,7 @@ class _SnakeGameState extends State<SnakeGame> {
     print("=== MOVE :");
     print("EVENT: $event");
     _board?.moveSnake(event);
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -105,18 +108,38 @@ class _SnakeGameState extends State<SnakeGame> {
     int y = 0;
     int x = 0;
 
+    print("---- PRINT BOARD");
+
     while (_board?.getLine(y) != null) {
+      print("y: $y");
       List<Widget> tmp = [];
       x = 0;
-      while (_board?.getCase(y, x) != null) {
+
+      BoardCase? boardCase = _board?.getCase(y, x);
+
+      while (boardCase != null) {
+        print("x: $x");
+        Color colorCase;
+        switch (boardCase.caseType) {
+          case CASE_TYPE.empty:
+            colorCase = Colors.grey;
+            break;
+          case CASE_TYPE.food:
+            colorCase = Colors.redAccent;
+            break;
+        }
+        if (boardCase.partSnake != null) {
+          colorCase = Colors.green;
+        }
         tmp.add(
           Container(
             width: widget.caseWidth,
             height: widget.caseWidth,
-            color: Colors.orange,
+            color: colorCase,
           ),
         );
         x++;
+        boardCase = _board?.getCase(y, x);
       }
       items.add(
         Row(

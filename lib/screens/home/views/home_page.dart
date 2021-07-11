@@ -11,6 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (snakeGame == null) {
+      print("-- INIT SNAKE GAME");
       snakeGame = SnakeGame(
         caseWidth: caseWidth,
         numberCaseHorizontally: numberCaseHorizontally,
