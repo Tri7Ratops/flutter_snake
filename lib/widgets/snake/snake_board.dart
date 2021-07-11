@@ -35,19 +35,21 @@ class SnakeBoard {
     }
   }
 
-  CASE_TYPE getCase(int y, int x) {
+  CASE_TYPE? getCase(int y, int x) {
     try {
       return _board[y][x];
     } catch (e) {
-      throw ("SNAKE BOARD: OUT OF THE BOARD");
+      print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
+      return null;
     }
   }
 
-  List<CASE_TYPE> getLine(int index) {
+  List<CASE_TYPE>? getLine(int index) {
     try {
       return _board[index];
     } catch (e) {
-      throw ("SNAKE BOARD: OUT OF THE BOARD");
+      print("SNAKE BOARD: OUT OF THE BOARD");
+      return null;
     }
   }
 
