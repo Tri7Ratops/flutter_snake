@@ -61,13 +61,12 @@ class _SnakeGameState extends State<SnakeGame> {
       controller = StreamController<SNAKE_MOVE>();
     }
     controller?.stream.listen((value) {
-      print("CONTROLLER LISTEN");
       _moveSnake(value);
     });
 
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      print("TIMER !: [${widget.getDirection}]");
-      print("widget.controller is null: ${controller == null}");
+//      print("TIMER !: [${widget.getDirection}]");
+//      print("widget.controller is null: ${controller == null}");
       controller?.add(widget.getDirection);
       widget.nextDirection = SNAKE_MOVE.front;
     });
@@ -82,8 +81,8 @@ class _SnakeGameState extends State<SnakeGame> {
 
   _moveSnake(SNAKE_MOVE event) {
     debugMove = "move $event";
-    print("=== MOVE :");
-    print("EVENT: $event");
+//    print("=== MOVE :");
+//    print("EVENT: $event");
     _board?.moveSnake(event);
     setState(() {});
   }
@@ -108,17 +107,14 @@ class _SnakeGameState extends State<SnakeGame> {
     int y = 0;
     int x = 0;
 
-    print("---- PRINT BOARD");
 
     while (_board?.getLine(y) != null) {
-      print("y: $y");
       List<Widget> tmp = [];
       x = 0;
 
       BoardCase? boardCase = _board?.getCase(y, x);
 
       while (boardCase != null) {
-        print("x: $x");
         Color colorCase;
         switch (boardCase.caseType) {
           case CASE_TYPE.empty:
@@ -129,7 +125,16 @@ class _SnakeGameState extends State<SnakeGame> {
             break;
         }
         if (boardCase.partSnake != null) {
-          colorCase = Colors.green;
+          switch (boardCase.partSnake!.type) {
+            case SNAKE_BODY.head:
+              colorCase = Colors.deepPurpleAccent;
+              break;
+            case SNAKE_BODY.tail:
+              colorCase = Colors.yellowAccent;
+              break;
+            default:
+              colorCase = Colors.black;
+          }
         }
         tmp.add(
           Container(

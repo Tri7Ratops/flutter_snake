@@ -17,10 +17,10 @@ class SnakeBoard {
     required this.numberCaseVertically,
   }) {
     _initBoard();
-//    _snake = SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: numberCaseHorizontally ~/ 2);
-//    _snake.next = SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: numberCaseHorizontally ~/ 2 - 1);
-//    _snake.next!.next = SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: numberCaseHorizontally ~/ 2 - 1);
-    //  _updateBoard();
+    _snake = new SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 3);
+    _snake.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 2);
+    _snake.next!.next = new SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: 1);
+    _updateBoard();
   }
 
   moveSnake(SNAKE_MOVE move) {}
@@ -33,35 +33,33 @@ class SnakeBoard {
     }
     SnakePart? snakeTmp = _snake;
     while (snakeTmp != null) {
-      _board[_snake.posY][_snake.posX].partSnake = snakeTmp;
+      print("${snakeTmp.type}: [${snakeTmp.posY}][${snakeTmp.posX}]");
+      _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
     }
+    print("----------------------------------");
   }
 
   _initBoard() {
-    print("--- INIT BOARD");
     int x = 0;
     int y = 0;
 
     while (y < this.numberCaseVertically) {
       x = 0;
-      print("INIT y: $y");
       _board.add([]);
       while (x < this.numberCaseHorizontally) {
         _board[y].add(BoardCase());
-        print("INIT x: $x");
         x++;
       }
       y++;
     }
-    print("--- END INIT BOARD");
   }
 
   BoardCase? getCase(int y, int x) {
     try {
       return _board[y][x];
     } catch (e) {
-      print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
+  //    print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
       return null;
     }
   }
@@ -70,7 +68,7 @@ class SnakeBoard {
     try {
       return _board[index];
     } catch (e) {
-      print("SNAKE BOARD: OUT OF THE BOARD");
+     // print("SNAKE BOARD: OUT OF THE BOARD");
       return null;
     }
   }
