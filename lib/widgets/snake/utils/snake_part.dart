@@ -8,5 +8,5 @@ class SnakePart {
   SnakePart? next;
   SnakePart? previous;
 
-  SnakePart({required this.type, required this.posY, required this.posX});
+  SnakePart({required this.type, required this.posY, required this.posX, this.previous, this.next,});
 }
