@@ -26,15 +26,53 @@ class SnakeBoard {
   }
 
   _snakeMoveRight(SNAKE_DIRECTION direction) {
-
+    SnakePart? snakeTmp = _tail;
+    while (snakeTmp?.previous != null) {
+      snakeTmp!.posX = snakeTmp.previous!.posX;
+      snakeTmp.posY = snakeTmp.previous!.posY;
+      snakeTmp = snakeTmp.previous;
+    }
+    switch (direction) {
+      case SNAKE_DIRECTION.left:
+        _snake.posY--;
+        break;
+      case SNAKE_DIRECTION.right:
+        _snake.posY++;
+        break;
+      case SNAKE_DIRECTION.up:
+        _snake.posX++;
+        break;
+      case SNAKE_DIRECTION.down:
+        _snake.posX--;
+        break;
+    }
   }
 
   _snakeMoveLeft(SNAKE_DIRECTION direction) {
-
+    SnakePart? snakeTmp = _tail;
+    while (snakeTmp?.previous != null) {
+      snakeTmp!.posX = snakeTmp.previous!.posX;
+      snakeTmp.posY = snakeTmp.previous!.posY;
+      snakeTmp = snakeTmp.previous;
+    }
+    print(direction);
+    switch (direction) {
+      case SNAKE_DIRECTION.left:
+        _snake.posY++;
+        break;
+      case SNAKE_DIRECTION.right:
+        _snake.posY--;
+        break;
+      case SNAKE_DIRECTION.up:
+        _snake.posX--;
+        break;
+      case SNAKE_DIRECTION.down:
+        _snake.posX++;
+        break;
+    }
   }
 
   _snakeMoveFront(SNAKE_DIRECTION direction) {
-
     SnakePart? snakeTmp = _tail;
     while (snakeTmp?.previous != null) {
       snakeTmp!.posX = snakeTmp.previous!.posX;
@@ -96,7 +134,7 @@ class SnakeBoard {
     }
     SnakePart? snakeTmp = _snake;
     while (snakeTmp != null && getCase(snakeTmp.posY, snakeTmp.posX) != null) {
-      print("${snakeTmp.type}: [${snakeTmp.posY}][${snakeTmp.posX}]");
+    //  print("${snakeTmp.type}: [${snakeTmp.posY}][${snakeTmp.posX}]");
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
     }
