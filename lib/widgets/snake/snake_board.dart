@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
+import 'package:flutter_snake/widgets/snake/snake_enums/game_event.dart';
 import 'package:flutter_snake/widgets/snake/utils/board_case.dart';
 import 'package:flutter_snake/widgets/snake/utils/snake_part.dart';
 
@@ -18,20 +19,17 @@ class SnakeBoard {
     required this.numberCaseVertically,
   }) {
     _initBoard();
-    _snake = new SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 3);
-    _snake.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 2, previous: _snake);
-    _snake.next!.next = new SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: 1, previous: _snake.next!);
-    _tail = _snake.next!.next!;
+    _snake = new SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 5);
+    _snake.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 4, previous: _snake);
+    _snake.next!.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 3, previous: _snake.next!);
+    _snake.next!.next!.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 2, previous: _snake.next!.next!);
+    _snake.next!.next!.next!.next =
+        new SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: 1, previous: _snake.next!.next!.next!);
+    _tail = _snake.next!.next!.next!.next!;
     _updateBoard();
   }
 
   _snakeMoveRight(SNAKE_DIRECTION direction) {
-    SnakePart? snakeTmp = _tail;
-    while (snakeTmp?.previous != null) {
-      snakeTmp!.posX = snakeTmp.previous!.posX;
-      snakeTmp.posY = snakeTmp.previous!.posY;
-      snakeTmp = snakeTmp.previous;
-    }
     switch (direction) {
       case SNAKE_DIRECTION.left:
         _snake.posY--;
@@ -49,13 +47,6 @@ class SnakeBoard {
   }
 
   _snakeMoveLeft(SNAKE_DIRECTION direction) {
-    SnakePart? snakeTmp = _tail;
-    while (snakeTmp?.previous != null) {
-      snakeTmp!.posX = snakeTmp.previous!.posX;
-      snakeTmp.posY = snakeTmp.previous!.posY;
-      snakeTmp = snakeTmp.previous;
-    }
-    print(direction);
     switch (direction) {
       case SNAKE_DIRECTION.left:
         _snake.posY++;
@@ -73,12 +64,6 @@ class SnakeBoard {
   }
 
   _snakeMoveFront(SNAKE_DIRECTION direction) {
-    SnakePart? snakeTmp = _tail;
-    while (snakeTmp?.previous != null) {
-      snakeTmp!.posX = snakeTmp.previous!.posX;
-      snakeTmp.posY = snakeTmp.previous!.posY;
-      snakeTmp = snakeTmp.previous;
-    }
     switch (direction) {
       case SNAKE_DIRECTION.left:
         _snake.posX--;
@@ -95,26 +80,26 @@ class SnakeBoard {
     }
   }
 
-  moveSnake(SNAKE_MOVE move) {
+  GAME_EVENT? moveSnake(SNAKE_MOVE move) {
     SNAKE_DIRECTION direction;
     if (_snake.next!.posX == _snake.posX) {
-      // VERTICAL
       if (_snake.next!.posY < _snake.posY) {
         direction = SNAKE_DIRECTION.down;
-        // TO BOTTOM
       } else {
         direction = SNAKE_DIRECTION.up;
-        // TO UP
       }
     } else {
-      // HORIZONTAL
       if (_snake.next!.posX < _snake.posX) {
-        // TO RIGHT
         direction = SNAKE_DIRECTION.right;
       } else {
-        // TO LEFT
         direction = SNAKE_DIRECTION.left;
       }
+    }
+    SnakePart? snakeTmp = _tail;
+    while (snakeTmp?.previous != null) {
+      snakeTmp!.posX = snakeTmp.previous!.posX;
+      snakeTmp.posY = snakeTmp.previous!.posY;
+      snakeTmp = snakeTmp.previous;
     }
     if (move == SNAKE_MOVE.right) {
       _snakeMoveRight(direction);
@@ -123,10 +108,16 @@ class SnakeBoard {
     } else {
       _snakeMoveFront(direction);
     }
-    _updateBoard();
+
+    /// Check if the snake go out of the map
+    if (_snake.posX < 0 || _snake.posX >= numberCaseHorizontally || _snake.posY < 0 || _snake.posY >= numberCaseVertically) {
+      return GAME_EVENT.out_of_map;
+    }
+    /// Check if the snake hit his tail and update the board
+    return _updateBoard();
   }
 
-  _updateBoard() {
+  GAME_EVENT? _updateBoard() {
     for (List<BoardCase> boardLine in _board) {
       for (BoardCase boardCase in boardLine) {
         boardCase.partSnake = null;
@@ -134,11 +125,12 @@ class SnakeBoard {
     }
     SnakePart? snakeTmp = _snake;
     while (snakeTmp != null && getCase(snakeTmp.posY, snakeTmp.posX) != null) {
-    //  print("${snakeTmp.type}: [${snakeTmp.posY}][${snakeTmp.posX}]");
+      if (_board[snakeTmp.posY][snakeTmp.posX].partSnake != null) {
+       return GAME_EVENT.hit_his_tail;
+      }
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
     }
-    print("----------------------------------");
   }
 
   _initBoard() {
@@ -160,7 +152,7 @@ class SnakeBoard {
     try {
       return _board[y][x];
     } catch (e) {
-  //    print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
+      //    print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
       return null;
     }
   }
@@ -169,7 +161,7 @@ class SnakeBoard {
     try {
       return _board[index];
     } catch (e) {
-     // print("SNAKE BOARD: OUT OF THE BOARD");
+      // print("SNAKE BOARD: OUT OF THE BOARD");
       return null;
     }
   }

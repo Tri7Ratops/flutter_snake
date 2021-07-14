@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 import 'package:flutter_snake/widgets/snake/snake_board.dart';
+import 'package:flutter_snake/widgets/snake/snake_enums/game_event.dart';
 import 'package:flutter_snake/widgets/snake/utils/board_case.dart';
 
 class SnakeGame extends StatefulWidget {
@@ -11,6 +12,11 @@ class SnakeGame extends StatefulWidget {
   set nextDirection(SNAKE_MOVE move) => _direction = move;
 
   SNAKE_MOVE get getDirection => _direction ?? SNAKE_MOVE.front;
+
+  // TODO: Add a controller to give information to the main class
+  // Example:
+  // When the game is finished
+  // The new score (Food eaten)
 
   final double caseWidth;
   final int numberCaseHorizontally;
@@ -48,7 +54,6 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   void initState() {
-    print("- INIT");
     super.initState();
 
     _board = SnakeBoard(
@@ -57,7 +62,6 @@ class _SnakeGameState extends State<SnakeGame> {
       numberCaseVertically: widget.numberCaseVertically,
     );
     if (controller == null) {
-      print("--- CONTROLLER SET");
       controller = StreamController<SNAKE_MOVE>();
     }
     controller?.stream.listen((value) {
@@ -65,8 +69,6 @@ class _SnakeGameState extends State<SnakeGame> {
     });
 
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-//      print("TIMER !: [${widget.getDirection}]");
-//      print("widget.controller is null: ${controller == null}");
       controller?.add(widget.getDirection);
       widget.nextDirection = SNAKE_MOVE.front;
     });
@@ -74,16 +76,18 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   void dispose() {
-    print("- DISPOSE");
     timer?.cancel();
     super.dispose();
   }
 
-  _moveSnake(SNAKE_MOVE event) {
-    debugMove = "move $event";
-//    print("=== MOVE :");
-//    print("EVENT: $event");
-    _board?.moveSnake(event);
+  _moveSnake(SNAKE_MOVE direction) {
+    debugMove = "move $direction";
+    GAME_EVENT? event = _board?.moveSnake(direction);
+    print("-- EVENT: $event");
+    if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
+      timer?.cancel();
+    }
+
     setState(() {});
   }
 

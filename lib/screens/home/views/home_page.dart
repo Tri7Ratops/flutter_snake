@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 
 class HomePage extends StatelessWidget {
-  final double caseWidth = 25.0;
-  final int numberCaseHorizontally = 10;
-  final int numberCaseVertically = 10;
+  final double caseWidth = 15.0;
+  final int numberCaseHorizontally = 20;
+  final int numberCaseVertically = 20;
   SnakeGame? snakeGame;
 
   @override
