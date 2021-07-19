@@ -24,15 +24,17 @@ class SnakeGame extends StatefulWidget {
   final Duration durationBetweenTicks;
   final Color borderColor;
   final Color backgroundColor;
+  final StreamController<GAME_EVENT>? controllerEvent;
 
   SnakeGame({
     Key? key,
     required this.caseWidth,
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
-    this.durationBetweenTicks = const Duration(milliseconds: 200),
+    this.durationBetweenTicks = const Duration(milliseconds: 500),
     this.borderColor = Colors.black,
     this.backgroundColor = Colors.grey,
+    this.controllerEvent,
   }) : super(
           key: key,
         ) {
@@ -84,8 +86,11 @@ class _SnakeGameState extends State<SnakeGame> {
     debugMove = "move $direction";
     GAME_EVENT? event = _board?.moveSnake(direction);
     print("-- EVENT: $event");
-    if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
-      timer?.cancel();
+    if (event != null) {
+      widget.controllerEvent?.add(event);
+      if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
+        timer?.cancel();
+      }
     }
 
     setState(() {});

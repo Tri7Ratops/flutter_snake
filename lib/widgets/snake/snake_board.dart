@@ -83,7 +83,9 @@ class SnakeBoard {
   }
 
   GAME_EVENT? moveSnake(SNAKE_MOVE move) {
+    GAME_EVENT? event;
     SNAKE_DIRECTION direction;
+
     if (_snake.next!.posX == _snake.posX) {
       if (_snake.next!.posY < _snake.posY) {
         direction = SNAKE_DIRECTION.down;
@@ -101,6 +103,7 @@ class SnakeBoard {
       SnakePart newPart = SnakePart(type: SNAKE_BODY.body, posY: _snake.posY, posX: _snake.posX, previous: _snake, next: _snake.next);
       _snake.next!.previous = newPart;
       _snake.next = newPart;
+      event = GAME_EVENT.food_eaten;
     } else {
       SnakePart? snakeTmp = _tail;
       while (snakeTmp?.previous != null) {
@@ -123,7 +126,7 @@ class SnakeBoard {
     }
 
     /// Check if the snake hit his tail and update the board
-    return _updateBoard();
+    return _updateBoard() ?? event;
   }
 
   GAME_EVENT? _updateBoard() {
@@ -143,7 +146,7 @@ class SnakeBoard {
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
     }
-    _manageFood();
+    return _manageFood();
   }
 
   _manageFood() {
