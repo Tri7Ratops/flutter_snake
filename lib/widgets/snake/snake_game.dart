@@ -30,7 +30,7 @@ class SnakeGame extends StatefulWidget {
     required this.caseWidth,
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
-    this.durationBetweenTicks = const Duration(seconds: 1),
+    this.durationBetweenTicks = const Duration(milliseconds: 200),
     this.borderColor = Colors.black,
     this.backgroundColor = Colors.grey,
   }) : super(
@@ -68,7 +68,7 @@ class _SnakeGameState extends State<SnakeGame> {
       _moveSnake(value);
     });
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+    timer = Timer.periodic(widget.durationBetweenTicks, (Timer t) {
       controller?.add(widget.getDirection);
       widget.nextDirection = SNAKE_MOVE.front;
     });

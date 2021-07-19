@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_snake/widgets/snake/snake.dart';
 import 'package:flutter_snake/widgets/snake/snake_enums/game_event.dart';
@@ -95,11 +97,17 @@ class SnakeBoard {
         direction = SNAKE_DIRECTION.left;
       }
     }
-    SnakePart? snakeTmp = _tail;
-    while (snakeTmp?.previous != null) {
-      snakeTmp!.posX = snakeTmp.previous!.posX;
-      snakeTmp.posY = snakeTmp.previous!.posY;
-      snakeTmp = snakeTmp.previous;
+    if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.food) {
+      SnakePart newPart = SnakePart(type: SNAKE_BODY.body, posY: _snake.posY, posX: _snake.posX, previous: _snake, next: _snake.next);
+      _snake.next!.previous = newPart;
+      _snake.next = newPart;
+    } else {
+      SnakePart? snakeTmp = _tail;
+      while (snakeTmp?.previous != null) {
+        snakeTmp!.posX = snakeTmp.previous!.posX;
+        snakeTmp.posY = snakeTmp.previous!.posY;
+        snakeTmp = snakeTmp.previous;
+      }
     }
     if (move == SNAKE_MOVE.right) {
       _snakeMoveRight(direction);
@@ -113,6 +121,7 @@ class SnakeBoard {
     if (_snake.posX < 0 || _snake.posX >= numberCaseHorizontally || _snake.posY < 0 || _snake.posY >= numberCaseVertically) {
       return GAME_EVENT.out_of_map;
     }
+
     /// Check if the snake hit his tail and update the board
     return _updateBoard();
   }
@@ -126,10 +135,33 @@ class SnakeBoard {
     SnakePart? snakeTmp = _snake;
     while (snakeTmp != null && getCase(snakeTmp.posY, snakeTmp.posX) != null) {
       if (_board[snakeTmp.posY][snakeTmp.posX].partSnake != null) {
-       return GAME_EVENT.hit_his_tail;
+        return GAME_EVENT.hit_his_tail;
+      }
+      if (snakeTmp.next == null) {
+        _board[snakeTmp.posY][snakeTmp.posX].caseType = CASE_TYPE.empty;
       }
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
+    }
+    _manageFood();
+  }
+
+  _manageFood() {
+    List<BoardCase> emptyCases = [];
+    int nbFood = 0;
+
+    for (List<BoardCase> boardLine in _board) {
+      for (BoardCase boardCase in boardLine) {
+        if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
+          emptyCases.add(boardCase);
+        } else if (boardCase.caseType == CASE_TYPE.food && boardCase.partSnake == null) {
+          nbFood++;
+        }
+      }
+    }
+    if (nbFood == 0) {
+      var rng = new Random();
+      emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.food;
     }
   }
 
