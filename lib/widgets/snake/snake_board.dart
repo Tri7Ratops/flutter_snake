@@ -130,6 +130,7 @@ class SnakeBoard {
   }
 
   GAME_EVENT? _updateBoard() {
+    bool hitHisTail = false;
     for (List<BoardCase> boardLine in _board) {
       for (BoardCase boardCase in boardLine) {
         boardCase.partSnake = null;
@@ -138,7 +139,7 @@ class SnakeBoard {
     SnakePart? snakeTmp = _snake;
     while (snakeTmp != null && getCase(snakeTmp.posY, snakeTmp.posX) != null) {
       if (_board[snakeTmp.posY][snakeTmp.posX].partSnake != null) {
-        return GAME_EVENT.hit_his_tail;
+        hitHisTail = true;
       }
       if (snakeTmp.next == null) {
         _board[snakeTmp.posY][snakeTmp.posX].caseType = CASE_TYPE.empty;
@@ -146,7 +147,7 @@ class SnakeBoard {
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
     }
-    return _manageFood();
+    return hitHisTail ? GAME_EVENT.hit_his_tail : _manageFood();
   }
 
   _manageFood() {
@@ -165,6 +166,9 @@ class SnakeBoard {
     if (nbFood == 0) {
       var rng = new Random();
       emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.food;
+    }
+    if (emptyCases.isEmpty) {
+      return GAME_EVENT.win;
     }
   }
 

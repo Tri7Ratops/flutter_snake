@@ -85,11 +85,11 @@ class _SnakeGameState extends State<SnakeGame> {
   _moveSnake(SNAKE_MOVE direction) {
     debugMove = "move $direction";
     GAME_EVENT? event = _board?.moveSnake(direction);
-    print("-- EVENT: $event");
     if (event != null) {
       widget.controllerEvent?.add(event);
       if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
         timer?.cancel();
+        timer = null;
       }
     }
 
@@ -115,7 +115,6 @@ class _SnakeGameState extends State<SnakeGame> {
     List<Widget> items = [];
     int y = 0;
     int x = 0;
-
 
     while (_board?.getLine(y) != null) {
       List<Widget> tmp = [];

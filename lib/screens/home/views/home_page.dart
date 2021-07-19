@@ -24,6 +24,14 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     controller = StreamController<GAME_EVENT>();
 
+    snakeGame = new SnakeGame(
+      caseWidth: caseWidth,
+      numberCaseHorizontally: numberCaseHorizontally,
+      numberCaseVertically: numberCaseVertically,
+      controllerEvent: controller,
+      durationBetweenTicks: Duration(milliseconds: 500),
+    );
+
     controller?.stream.listen((GAME_EVENT value) {
       setState(() {
         _eventList.add(value.toString());
@@ -39,16 +47,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (snakeGame == null) {
-      snakeGame = SnakeGame(
-        caseWidth: caseWidth,
-        numberCaseHorizontally: numberCaseHorizontally,
-        numberCaseVertically: numberCaseVertically,
-        controllerEvent: controller,
-        durationBetweenTicks: Duration(milliseconds: 500),
-      );
-    }
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,6 +75,32 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
+              onPressed: () {
+                print("-- START");
+                setState(() {
+                  snakeGame = new SnakeGame(
+                    caseWidth: caseWidth,
+                    numberCaseHorizontally: numberCaseHorizontally,
+                    numberCaseVertically: numberCaseVertically,
+                    controllerEvent: controller,
+                    durationBetweenTicks: Duration(milliseconds: 500),
+                  );
+                  _eventList.clear();
+                });
+              },
+              child: Text("START"),
+            ),
+            TextButton(
+              onPressed: () {
+                print("-- RESTART");
+                setState(() {
+                  snakeGame = null;
+                  _eventList.clear();
+                });
+              },
+              child: Text("STOP"),
+            ),
+            TextButton(
               onPressed: () => snakeGame?.nextDirection = SNAKE_MOVE.left,
               child: Text("LEFT"),
             ),
@@ -93,10 +117,9 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(8),
           itemCount: _eventList.length,
           itemBuilder: (BuildContext context, int index) {
-            var list  = _eventList.reversed;
             return Container(
               height: 50,
-              child: Center(child: Text('EVENT: ${list.elementAt(index)}')),
+              child: Center(child: Text('EVENT: ${_eventList.reversed.elementAt(index)}')),
             );
           },
           separatorBuilder: (BuildContext context, int index) => const Divider(),
