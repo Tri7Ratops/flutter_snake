@@ -11,9 +11,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final double caseWidth = 25.0;
-  final int numberCaseHorizontally = 10;
-  final int numberCaseVertically = 10;
+  double caseWidth = 25.0;
+  final int numberCaseHorizontally = 11;
+  final int numberCaseVertically = 11;
   StreamController<GAME_EVENT>? controller;
   SnakeGame? snakeGame;
 
@@ -29,6 +29,8 @@ class _HomePageState extends State<HomePage> {
       numberCaseHorizontally: numberCaseHorizontally,
       numberCaseVertically: numberCaseVertically,
       controllerEvent: controller,
+      colorBackground1: Color(0XFF32CD32),
+      colorBackground2: Color(0XFF7CFC00),
       durationBetweenTicks: Duration(milliseconds: 500),
     );
 
@@ -99,6 +101,14 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               child: Text("STOP"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  snakeGame?.caseWidth = 10.0;
+                });
+              },
+              child: Text("REDUCE"),
             ),
             TextButton(
               onPressed: () => snakeGame?.nextDirection = SNAKE_MOVE.left,

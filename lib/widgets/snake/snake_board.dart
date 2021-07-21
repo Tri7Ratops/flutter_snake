@@ -191,7 +191,6 @@ class SnakeBoard {
     try {
       return _board[y][x];
     } catch (e) {
-      //    print("SNAKE BOARD: OUT OF THE BOARD [$y][$x]");
       return null;
     }
   }
@@ -200,7 +199,6 @@ class SnakeBoard {
     try {
       return _board[index];
     } catch (e) {
-      // print("SNAKE BOARD: OUT OF THE BOARD");
       return null;
     }
   }

@@ -5,26 +5,32 @@ import 'package:flutter_snake/widgets/snake/snake.dart';
 import 'package:flutter_snake/widgets/snake/snake_board.dart';
 import 'package:flutter_snake/widgets/snake/snake_enums/game_event.dart';
 import 'package:flutter_snake/widgets/snake/utils/board_case.dart';
+import 'package:flutter_snake/widgets/snake/utils/snake_part.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SnakeGame extends StatefulWidget {
   SNAKE_MOVE? _direction;
+  double caseWidth;
+  Duration durationBetweenTicks;
 
   set nextDirection(SNAKE_MOVE move) => _direction = move;
 
   SNAKE_MOVE get getDirection => _direction ?? SNAKE_MOVE.front;
 
-  // TODO: Add a controller to give information to the main class
-  // Example:
-  // When the game is finished
-  // The new score (Food eaten)
-
-  final double caseWidth;
   final int numberCaseHorizontally;
   final int numberCaseVertically;
-  final Duration durationBetweenTicks;
-  final Color borderColor;
-  final Color backgroundColor;
   final StreamController<GAME_EVENT>? controllerEvent;
+
+  final Color colorBackground1;
+  final Color colorBackground2;
+  final Color snakeColor;
+  final Color foodColor;
+
+  final String? snakeSVGHead;
+  final String? snakeSVGBody;
+  final String? snakeSVGBodyTurn;
+  final String? snakeSVGTail;
+  final String? snakeSVGFruit;
 
   SnakeGame({
     Key? key,
@@ -32,9 +38,16 @@ class SnakeGame extends StatefulWidget {
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
     this.durationBetweenTicks = const Duration(milliseconds: 500),
-    this.borderColor = Colors.black,
-    this.backgroundColor = Colors.grey,
     this.controllerEvent,
+    this.colorBackground1 = Colors.greenAccent,
+    this.colorBackground2 = Colors.green,
+    this.foodColor = Colors.red,
+    this.snakeColor = Colors.black,
+    this.snakeSVGHead = "assets/default_snake_head.svg",
+    this.snakeSVGBody = "assets/default_snake_body.svg",
+    this.snakeSVGBodyTurn = "assets/default_snake_turn.svg",
+    this.snakeSVGTail = "assets/default_snake_tail.svg",
+    this.snakeSVGFruit = "assets/default_snake_fruit.svg",
   }) : super(
           key: key,
         ) {
@@ -51,8 +64,6 @@ class _SnakeGameState extends State<SnakeGame> {
   StreamController<SNAKE_MOVE>? controller;
   SnakeBoard? _board;
   Timer? timer;
-
-  String? debugMove;
 
   @override
   void initState() {
@@ -83,8 +94,8 @@ class _SnakeGameState extends State<SnakeGame> {
   }
 
   _moveSnake(SNAKE_MOVE direction) {
-    debugMove = "move $direction";
     GAME_EVENT? event = _board?.moveSnake(direction);
+    setState(() {});
     if (event != null) {
       widget.controllerEvent?.add(event);
       if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
@@ -92,22 +103,15 @@ class _SnakeGameState extends State<SnakeGame> {
         timer = null;
       }
     }
-
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(debugMove ?? "No move"),
-        Container(
-          color: widget.backgroundColor,
-          width: widget.caseWidth * widget.numberCaseHorizontally,
-          height: widget.caseWidth * widget.numberCaseVertically,
-          child: _printBoard(),
-        ),
-      ],
+    return Container(
+      color: Colors.grey,
+      width: widget.caseWidth * widget.numberCaseHorizontally,
+      height: widget.caseWidth * widget.numberCaseVertically,
+      child: _printBoard(),
     );
   }
 
@@ -119,36 +123,65 @@ class _SnakeGameState extends State<SnakeGame> {
     while (_board?.getLine(y) != null) {
       List<Widget> tmp = [];
       x = 0;
-
       BoardCase? boardCase = _board?.getCase(y, x);
 
       while (boardCase != null) {
-        Color colorCase;
+        Color? colorCase;
+        String? svgIcon;
+        int quarterTurns = 0;
+        colorCase = (x % 2 == 0 && y % 2 == 0) || (x % 2 == 1 && y % 2 == 1) ? widget.colorBackground1 : widget.colorBackground2;
         switch (boardCase.caseType) {
-          case CASE_TYPE.empty:
-            colorCase = Colors.grey;
-            break;
           case CASE_TYPE.food:
-            colorCase = Colors.redAccent;
+            svgIcon = widget.snakeSVGFruit;
+            if (svgIcon == null) colorCase = widget.foodColor;
             break;
+          default:
         }
         if (boardCase.partSnake != null) {
           switch (boardCase.partSnake!.type) {
             case SNAKE_BODY.head:
-              colorCase = Colors.deepPurpleAccent;
+              svgIcon = widget.snakeSVGHead;
+              quarterTurns = _rotateHead(boardCase.partSnake!);
+              if (svgIcon == null) colorCase = widget.snakeColor;
               break;
             case SNAKE_BODY.tail:
-              colorCase = Colors.yellowAccent;
+              svgIcon = widget.snakeSVGTail;
+              quarterTurns = _rotateTail(boardCase.partSnake!);
+              if (svgIcon == null) colorCase = widget.snakeColor;
               break;
             default:
-              colorCase = Colors.black;
+              if (boardCase.partSnake!.previous!.posX == boardCase.partSnake!.next!.posX ||
+                  boardCase.partSnake!.previous!.posY == boardCase.partSnake!.next!.posY) {
+                quarterTurns = _rotateBody(boardCase.partSnake!);
+                svgIcon = widget.snakeSVGBody;
+              } else {
+                quarterTurns = _rotateBodyTurn(boardCase.partSnake!);
+                svgIcon = widget.snakeSVGBodyTurn;
+              }
+              if (svgIcon == null) {
+                colorCase = widget.snakeColor;
+              }
           }
         }
         tmp.add(
-          Container(
-            width: widget.caseWidth,
-            height: widget.caseWidth,
-            color: colorCase,
+          Stack(
+            children: [
+              Container(
+                width: widget.caseWidth,
+                height: widget.caseWidth,
+                color: colorCase,
+              ),
+              (svgIcon != null)
+                  ? RotatedBox(
+                      quarterTurns: quarterTurns,
+                      child: SvgPicture.asset(
+                        svgIcon,
+                        width: widget.caseWidth,
+                        height: widget.caseWidth,
+                      ),
+                    )
+                  : Container(),
+            ],
           ),
         );
         x++;
@@ -159,12 +192,95 @@ class _SnakeGameState extends State<SnakeGame> {
           children: tmp,
         ),
       );
-
       y++;
     }
 
     return Column(
       children: items,
     );
+  }
+
+  int _rotateHead(SnakePart partSnake) {
+    if (partSnake.next!.posX == partSnake.posX) {
+      if (partSnake.next!.posY < partSnake.posY) {
+        return 3;
+      } else {
+        return 1;
+      }
+    } else {
+      if (partSnake.next!.posX < partSnake.posX) {
+        return 2;
+      } else {
+        return 0;
+      }
+    }
+  }
+
+  int _rotateTail(SnakePart partSnake) {
+    if (partSnake.previous!.posX == partSnake.posX) {
+      if (partSnake.previous!.posY < partSnake.posY) {
+        return 0;
+      } else {
+        return 2;
+      }
+    } else {
+      if (partSnake.previous!.posX < partSnake.posX) {
+        return 3;
+      } else {
+        return 1;
+      }
+    }
+  }
+
+  int _rotateBody(SnakePart partSnake) {
+    if (partSnake.previous!.posX == partSnake.posX) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  int _rotateBodyTurn(SnakePart partSnake) {
+    SnakePart previous = partSnake.previous!;
+    SnakePart next = partSnake.next!;
+
+    SNAKE_DIRECTION directionPrevious = _rotateBodyTurnCheckDirection(partSnake, previous);
+    SNAKE_DIRECTION directionNext = _rotateBodyTurnCheckDirection(partSnake, next);
+
+    if (directionNext == SNAKE_DIRECTION.down && directionPrevious == SNAKE_DIRECTION.right) {
+      return 1;
+    }
+    if (directionNext == SNAKE_DIRECTION.down && directionPrevious == SNAKE_DIRECTION.left) {
+      return 2;
+    }
+    if (directionNext == SNAKE_DIRECTION.up && directionPrevious == SNAKE_DIRECTION.left) {
+      return 3;
+    }
+    if (directionNext == SNAKE_DIRECTION.left && directionPrevious == SNAKE_DIRECTION.up) {
+      return 3;
+    }
+    if (directionNext == SNAKE_DIRECTION.left && directionPrevious == SNAKE_DIRECTION.down) {
+      return 2;
+    }
+    if (directionNext == SNAKE_DIRECTION.right && directionPrevious == SNAKE_DIRECTION.down) {
+      return 1;
+    }
+    return 0;
+  }
+
+  SNAKE_DIRECTION _rotateBodyTurnCheckDirection(SnakePart partSnake, SnakePart compare) {
+    if (compare.posX == partSnake.posX) {
+      if (compare.posY < partSnake.posY) {
+        return SNAKE_DIRECTION.down;
+      } else {
+        return SNAKE_DIRECTION.up;
+      }
+    } else {
+      if (compare.posX < partSnake.posX) {
+        return SNAKE_DIRECTION.right;
+      } else {
+        return SNAKE_DIRECTION.left;
+      }
+    }
   }
 }
