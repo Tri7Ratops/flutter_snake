@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_snake/src/snake_board.dart';
-import 'utils/utils.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'snake_enums/snake_enums.dart';
+import 'utils/utils.dart';
 
 class SnakeGame extends StatefulWidget {
   SNAKE_MOVE? _direction;
@@ -22,14 +21,12 @@ class SnakeGame extends StatefulWidget {
 
   final Color colorBackground1;
   final Color colorBackground2;
-  final Color snakeColor;
-  final Color foodColor;
 
-  final String? snakeSVGHead;
-  final String? snakeSVGBody;
-  final String? snakeSVGBodyTurn;
-  final String? snakeSVGTail;
-  final String? snakeSVGFruit;
+  final String? snakeHeadImgPath;
+  final String? snakeBodyImgPath;
+  final String? snakeBodyTurnImgPath;
+  final String? snakeTailImgPath;
+  final String? snakeFruitImgPath;
 
   SnakeGame({
     Key? key,
@@ -40,13 +37,11 @@ class SnakeGame extends StatefulWidget {
     this.controllerEvent,
     this.colorBackground1 = Colors.greenAccent,
     this.colorBackground2 = Colors.green,
-    this.foodColor = Colors.red,
-    this.snakeColor = Colors.black,
-    this.snakeSVGHead = "assets/default_snake_head.svg",
-    this.snakeSVGBody = "assets/default_snake_body.svg",
-    this.snakeSVGBodyTurn = "assets/default_snake_turn.svg",
-    this.snakeSVGTail = "assets/default_snake_tail.svg",
-    this.snakeSVGFruit = "assets/default_snake_fruit.svg",
+    this.snakeBodyImgPath,
+    this.snakeBodyTurnImgPath,
+    this.snakeTailImgPath,
+    this.snakeFruitImgPath,
+    this.snakeHeadImgPath,
   }) : super(
           key: key,
         ) {
@@ -126,39 +121,39 @@ class _SnakeGameState extends State<SnakeGame> {
 
       while (boardCase != null) {
         Color? colorCase;
-        String? svgIcon;
+        bool? defaultImg;
+        String imgIcon = "";
         int quarterTurns = 0;
         colorCase = (x % 2 == 0 && y % 2 == 0) || (x % 2 == 1 && y % 2 == 1) ? widget.colorBackground1 : widget.colorBackground2;
         switch (boardCase.caseType) {
           case CASE_TYPE.food:
-            svgIcon = widget.snakeSVGFruit;
-            if (svgIcon == null) colorCase = widget.foodColor;
+            defaultImg = widget.snakeFruitImgPath == null;
+            imgIcon = widget.snakeFruitImgPath ?? "assets/default_snake_fruit.png";
             break;
           default:
         }
         if (boardCase.partSnake != null) {
           switch (boardCase.partSnake!.type) {
             case SNAKE_BODY.head:
-              svgIcon = widget.snakeSVGHead;
+              defaultImg = widget.snakeHeadImgPath == null;
+              imgIcon = widget.snakeHeadImgPath ?? "assets/default_snake_head.png";
               quarterTurns = _rotateHead(boardCase.partSnake!);
-              if (svgIcon == null) colorCase = widget.snakeColor;
               break;
             case SNAKE_BODY.tail:
-              svgIcon = widget.snakeSVGTail;
+              defaultImg = widget.snakeTailImgPath == null;
+              imgIcon = widget.snakeTailImgPath ?? "assets/default_snake_tail.png";
               quarterTurns = _rotateTail(boardCase.partSnake!);
-              if (svgIcon == null) colorCase = widget.snakeColor;
               break;
             default:
               if (boardCase.partSnake!.previous!.posX == boardCase.partSnake!.next!.posX ||
                   boardCase.partSnake!.previous!.posY == boardCase.partSnake!.next!.posY) {
+                defaultImg = widget.snakeBodyImgPath == null;
                 quarterTurns = _rotateBody(boardCase.partSnake!);
-                svgIcon = widget.snakeSVGBody;
+                imgIcon = widget.snakeBodyImgPath ?? "assets/default_snake_body.png";
               } else {
+                defaultImg = widget.snakeBodyTurnImgPath == null;
                 quarterTurns = _rotateBodyTurn(boardCase.partSnake!);
-                svgIcon = widget.snakeSVGBodyTurn;
-              }
-              if (svgIcon == null) {
-                colorCase = widget.snakeColor;
+                imgIcon = widget.snakeBodyTurnImgPath ?? "assets/default_snake_turn.png";
               }
           }
         }
@@ -170,14 +165,21 @@ class _SnakeGameState extends State<SnakeGame> {
                 height: widget.caseWidth,
                 color: colorCase,
               ),
-              (svgIcon != null)
+              defaultImg != null
                   ? RotatedBox(
                       quarterTurns: quarterTurns,
-                      child: SvgPicture.asset(
-                        svgIcon,
-                        width: widget.caseWidth,
-                        height: widget.caseWidth,
-                      ),
+                      child: defaultImg
+                          ? Image.asset(
+                              imgIcon,
+                              width: widget.caseWidth,
+                              height: widget.caseWidth,
+                              package: 'flutter_snake',
+                            )
+                          : Image(
+                              image: AssetImage(imgIcon),
+                              width: widget.caseWidth,
+                              height: widget.caseWidth,
+                            ),
                     )
                   : Container(),
             ],
