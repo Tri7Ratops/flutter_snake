@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'FLUUTER_SNAKE'),
+      home: MyHomePage(title: 'FLUTTER_SNAKE'),
     );
   }
 }
@@ -46,7 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
       numberCaseHorizontally: 11,
       numberCaseVertically: 11,
       controllerEvent: controller,
-      durationBetweenTicks: Duration(milliseconds: 500),
+      durationBetweenTicks: Duration(milliseconds: 400),
+      colorBackground1: Color(0XFF7CFC00),
+      colorBackground2: Color(0XFF32CD32),
     );
   }
 
