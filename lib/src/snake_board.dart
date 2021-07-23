@@ -28,12 +28,28 @@ class SnakeBoard {
     _initBoard();
 
     /// Create the snake
-    _snake = new SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 5);
-    _snake.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 4, previous: _snake);
-    _snake.next!.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 3, previous: _snake.next!);
-    _snake.next!.next!.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 2, previous: _snake.next!.next!);
-    _snake.next!.next!.next!.next =
-        new SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: 1, previous: _snake.next!.next!.next!);
+    _snake = new SnakePart(
+        type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 5);
+    _snake.next = new SnakePart(
+        type: SNAKE_BODY.body,
+        posY: numberCaseVertically ~/ 2,
+        posX: 4,
+        previous: _snake);
+    _snake.next!.next = new SnakePart(
+        type: SNAKE_BODY.body,
+        posY: numberCaseVertically ~/ 2,
+        posX: 3,
+        previous: _snake.next!);
+    _snake.next!.next!.next = new SnakePart(
+        type: SNAKE_BODY.body,
+        posY: numberCaseVertically ~/ 2,
+        posX: 2,
+        previous: _snake.next!.next!);
+    _snake.next!.next!.next!.next = new SnakePart(
+        type: SNAKE_BODY.tail,
+        posY: numberCaseVertically ~/ 2,
+        posX: 1,
+        previous: _snake.next!.next!.next!);
     _tail = _snake.next!.next!.next!.next!;
 
     /// Update the board with the snake
@@ -115,7 +131,12 @@ class SnakeBoard {
     }
     if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.food) {
       /// Add a new part of the snake if the head is on a food
-      SnakePart newPart = SnakePart(type: SNAKE_BODY.body, posY: _snake.posY, posX: _snake.posX, previous: _snake, next: _snake.next);
+      SnakePart newPart = SnakePart(
+          type: SNAKE_BODY.body,
+          posY: _snake.posY,
+          posX: _snake.posX,
+          previous: _snake,
+          next: _snake.next);
       _snake.next!.previous = newPart;
       _snake.next = newPart;
       event = GAME_EVENT.food_eaten;
@@ -137,7 +158,10 @@ class SnakeBoard {
     }
 
     /// Check if the snake go out of the map
-    if (_snake.posX < 0 || _snake.posX >= numberCaseHorizontally || _snake.posY < 0 || _snake.posY >= numberCaseVertically) {
+    if (_snake.posX < 0 ||
+        _snake.posX >= numberCaseHorizontally ||
+        _snake.posY < 0 ||
+        _snake.posY >= numberCaseVertically) {
       return GAME_EVENT.out_of_map;
     }
 
@@ -174,9 +198,11 @@ class SnakeBoard {
 
     for (List<BoardCase> boardLine in _board) {
       for (BoardCase boardCase in boardLine) {
-        if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
+        if (boardCase.caseType == CASE_TYPE.empty &&
+            boardCase.partSnake == null) {
           emptyCases.add(boardCase);
-        } else if (boardCase.caseType == CASE_TYPE.food && boardCase.partSnake == null) {
+        } else if (boardCase.caseType == CASE_TYPE.food &&
+            boardCase.partSnake == null) {
           nbFood++;
         }
       }
