@@ -5,20 +5,29 @@ import 'package:flutter_snake/src/snake_enums/snake_enums.dart';
 import 'package:flutter_snake/src/utils/utils.dart';
 
 class SnakeBoard {
-  List<List<BoardCase>> _board = [];
+  /// The board
+  final List<List<BoardCase>> _board = [];
+
+  /// Pointer to the snake's head
   late SnakePart _snake;
+
+  /// Pointer to snake's tail
   late SnakePart _tail;
 
-  final BuildContext context;
+  /// Number of case horizontally (x)
   final int numberCaseHorizontally;
+
+  /// Number of case horizontally (y)
   final int numberCaseVertically;
 
   SnakeBoard({
-    required this.context,
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
   }) {
+    /// Instanciate the board
     _initBoard();
+
+    /// Create the snake
     _snake = new SnakePart(type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 5);
     _snake.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 4, previous: _snake);
     _snake.next!.next = new SnakePart(type: SNAKE_BODY.body, posY: numberCaseVertically ~/ 2, posX: 3, previous: _snake.next!);
@@ -26,9 +35,12 @@ class SnakeBoard {
     _snake.next!.next!.next!.next =
         new SnakePart(type: SNAKE_BODY.tail, posY: numberCaseVertically ~/ 2, posX: 1, previous: _snake.next!.next!.next!);
     _tail = _snake.next!.next!.next!.next!;
+
+    /// Update the board with the snake
     _updateBoard();
   }
 
+  /// Manage the snake movement on the right
   _snakeMoveRight(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
@@ -46,6 +58,7 @@ class SnakeBoard {
     }
   }
 
+  /// Manage the snake movement on the left
   _snakeMoveLeft(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
@@ -63,6 +76,7 @@ class SnakeBoard {
     }
   }
 
+  /// Manage the snake movement on the front
   _snakeMoveFront(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
@@ -80,10 +94,12 @@ class SnakeBoard {
     }
   }
 
+  /// Manage the snake movement
   GAME_EVENT? moveSnake(SNAKE_MOVE move) {
     GAME_EVENT? event;
     SNAKE_DIRECTION direction;
 
+    /// Check his direction
     if (_snake.next!.posX == _snake.posX) {
       if (_snake.next!.posY < _snake.posY) {
         direction = SNAKE_DIRECTION.down;
@@ -98,11 +114,13 @@ class SnakeBoard {
       }
     }
     if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.food) {
+      /// Add a new part of the snake if the head is on a food
       SnakePart newPart = SnakePart(type: SNAKE_BODY.body, posY: _snake.posY, posX: _snake.posX, previous: _snake, next: _snake.next);
       _snake.next!.previous = newPart;
       _snake.next = newPart;
       event = GAME_EVENT.food_eaten;
     } else {
+      /// Move all the snake depends on his previous part
       SnakePart? snakeTmp = _tail;
       while (snakeTmp?.previous != null) {
         snakeTmp!.posX = snakeTmp.previous!.posX;
@@ -127,6 +145,7 @@ class SnakeBoard {
     return _updateBoard() ?? event;
   }
 
+  /// Update the board
   GAME_EVENT? _updateBoard() {
     bool hitHisTail = false;
     for (List<BoardCase> boardLine in _board) {
@@ -148,6 +167,7 @@ class SnakeBoard {
     return hitHisTail ? GAME_EVENT.hit_his_tail : _manageFood();
   }
 
+  /// Manage the food and his apparition
   _manageFood() {
     List<BoardCase> emptyCases = [];
     int nbFood = 0;
@@ -162,6 +182,7 @@ class SnakeBoard {
       }
     }
     if (nbFood == 0) {
+      /// Place a food on a empty case randomly
       var rng = new Random();
       emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.food;
     }
@@ -170,6 +191,7 @@ class SnakeBoard {
     }
   }
 
+  /// Init the board with empty case
   _initBoard() {
     int x = 0;
     int y = 0;
@@ -185,6 +207,7 @@ class SnakeBoard {
     }
   }
 
+  /// Get specific case
   BoardCase? getCase(int y, int x) {
     try {
       return _board[y][x];
@@ -193,6 +216,7 @@ class SnakeBoard {
     }
   }
 
+  /// Get specific line
   List<BoardCase>? getLine(int index) {
     try {
       return _board[index];
@@ -201,5 +225,6 @@ class SnakeBoard {
     }
   }
 
+  /// Get the board
   List<List<BoardCase>> get board => _board;
 }

@@ -6,22 +6,37 @@ import 'package:flutter_snake/src/snake_board.dart';
 import 'snake_enums/snake_enums.dart';
 import 'utils/utils.dart';
 
+// ignore: must_be_immutable
 class SnakeGame extends StatefulWidget {
+  /// Direction for the next tick
   SNAKE_MOVE? _direction;
-  double caseWidth;
-  Duration durationBetweenTicks;
 
+  /// Define the direction the snake will take on the next tick
   set nextDirection(SNAKE_MOVE move) => _direction = move;
 
+  /// Get the next direction the snake will take on the next tick
   SNAKE_MOVE get getDirection => _direction ?? SNAKE_MOVE.front;
 
+  /// Case width / height (It's a square)
+  double caseWidth;
+
+  /// Duration between each ticks
+  final Duration durationBetweenTicks;
+
+  /// Number of case horizontally (x)
   final int numberCaseHorizontally;
+
+  /// Number of case vertically (y)
   final int numberCaseVertically;
+
+  /// If defines, the controller stream receive the game event
   final StreamController<GAME_EVENT>? controllerEvent;
 
+  /// Color variation for the background
   final Color colorBackground1;
   final Color colorBackground2;
 
+  /// Snake image body and fruit
   final String? snakeHeadImgPath;
   final String? snakeBodyImgPath;
   final String? snakeBodyTurnImgPath;
@@ -55,26 +70,35 @@ class SnakeGame extends StatefulWidget {
 }
 
 class _SnakeGameState extends State<SnakeGame> {
+  /// Manage the movement of the snake
   StreamController<SNAKE_MOVE>? controller;
+
+  /// Board management
   SnakeBoard? _board;
+
+  /// Loop for the game
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
 
+    /// Init the board
     _board = SnakeBoard(
-      context: context,
       numberCaseHorizontally: widget.numberCaseHorizontally,
       numberCaseVertically: widget.numberCaseVertically,
     );
+
+    /// Init the controller
     if (controller == null) {
       controller = StreamController<SNAKE_MOVE>();
     }
+    /// and listen the events
     controller?.stream.listen((value) {
       _moveSnake(value);
     });
 
+    /// Defines the loop for the game
     timer = Timer.periodic(widget.durationBetweenTicks, (Timer t) {
       controller?.add(widget.getDirection);
       widget.nextDirection = SNAKE_MOVE.front;
@@ -83,15 +107,20 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   void dispose() {
+    /// Dispose the timer.
     timer?.cancel();
     super.dispose();
   }
 
   _moveSnake(SNAKE_MOVE direction) {
+    /// move the snake on the board
     GAME_EVENT? event = _board?.moveSnake(direction);
     setState(() {});
+
+    /// Check if a special event is returned
     if (event != null) {
       widget.controllerEvent?.add(event);
+      /// Check if the game is finished
       if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
         timer?.cancel();
         timer = null;
@@ -109,22 +138,30 @@ class _SnakeGameState extends State<SnakeGame> {
     );
   }
 
+  /// Look all the board and print it (Board first, the the snake / fruit)
   Column _printBoard() {
     List<Widget> items = [];
     int y = 0;
     int x = 0;
 
+    /// Check each line of the board
     while (_board?.getLine(y) != null) {
       List<Widget> tmp = [];
       x = 0;
+      /// Get a specific case of the board (y, x)
       BoardCase? boardCase = _board?.getCase(y, x);
 
+      /// Loop on each case of the line
       while (boardCase != null) {
         Color? colorCase;
         bool? defaultImg;
         String imgIcon = "";
         int quarterTurns = 0;
+
+        /// Create the checkerboard with 2 colors
         colorCase = (x % 2 == 0 && y % 2 == 0) || (x % 2 == 1 && y % 2 == 1) ? widget.colorBackground1 : widget.colorBackground2;
+
+        /// Check if the case contain food
         switch (boardCase.caseType) {
           case CASE_TYPE.food:
             defaultImg = widget.snakeFruitImgPath == null;
@@ -132,7 +169,9 @@ class _SnakeGameState extends State<SnakeGame> {
             break;
           default:
         }
+        /// Check if a snake is on it
         if (boardCase.partSnake != null) {
+          /// Check his type
           switch (boardCase.partSnake!.type) {
             case SNAKE_BODY.head:
               defaultImg = widget.snakeHeadImgPath == null;
@@ -201,6 +240,7 @@ class _SnakeGameState extends State<SnakeGame> {
     );
   }
 
+  /// Rotate the head depends on direction
   int _rotateHead(SnakePart partSnake) {
     if (partSnake.next!.posX == partSnake.posX) {
       if (partSnake.next!.posY < partSnake.posY) {
@@ -217,6 +257,7 @@ class _SnakeGameState extends State<SnakeGame> {
     }
   }
 
+  /// Rotate the tail depends on direction
   int _rotateTail(SnakePart partSnake) {
     if (partSnake.previous!.posX == partSnake.posX) {
       if (partSnake.previous!.posY < partSnake.posY) {
@@ -233,6 +274,7 @@ class _SnakeGameState extends State<SnakeGame> {
     }
   }
 
+  /// Rotate the body depends on direction
   int _rotateBody(SnakePart partSnake) {
     if (partSnake.previous!.posX == partSnake.posX) {
       return 1;
@@ -241,6 +283,7 @@ class _SnakeGameState extends State<SnakeGame> {
     }
   }
 
+  /// Rotate the body turn depends on direction
   int _rotateBodyTurn(SnakePart partSnake) {
     SnakePart previous = partSnake.previous!;
     SnakePart next = partSnake.next!;
@@ -269,6 +312,7 @@ class _SnakeGameState extends State<SnakeGame> {
     return 0;
   }
 
+  /// return the direction of a snake part to another one.
   SNAKE_DIRECTION _rotateBodyTurnCheckDirection(SnakePart partSnake, SnakePart compare) {
     if (compare.posX == partSnake.posX) {
       if (compare.posY < partSnake.posY) {
