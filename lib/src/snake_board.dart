@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_snake/src/snake_enums/snake_enums.dart';
 import 'package:flutter_snake/src/utils/utils.dart';
 
@@ -29,47 +28,72 @@ class SnakeBoard {
 
     /// Create the snake
     _snake = new SnakePart(
-        type: SNAKE_BODY.head, posY: numberCaseVertically ~/ 2, posX: 5);
+      type: SNAKE_BODY.head,
+      posY: numberCaseVertically ~/ 2,
+      posX: 5,
+    );
     _snake.next = new SnakePart(
-        type: SNAKE_BODY.body,
-        posY: numberCaseVertically ~/ 2,
-        posX: 4,
-        previous: _snake);
+      type: SNAKE_BODY.body,
+      posY: numberCaseVertically ~/ 2,
+      posX: 4,
+      previous: _snake,
+    );
     _snake.next!.next = new SnakePart(
-        type: SNAKE_BODY.body,
-        posY: numberCaseVertically ~/ 2,
-        posX: 3,
-        previous: _snake.next!);
+      type: SNAKE_BODY.body,
+      posY: numberCaseVertically ~/ 2,
+      posX: 3,
+      previous: _snake.next!,
+    );
     _snake.next!.next!.next = new SnakePart(
-        type: SNAKE_BODY.body,
-        posY: numberCaseVertically ~/ 2,
-        posX: 2,
-        previous: _snake.next!.next!);
+      type: SNAKE_BODY.body,
+      posY: numberCaseVertically ~/ 2,
+      posX: 2,
+      previous: _snake.next!.next!,
+    );
     _snake.next!.next!.next!.next = new SnakePart(
-        type: SNAKE_BODY.tail,
-        posY: numberCaseVertically ~/ 2,
-        posX: 1,
-        previous: _snake.next!.next!.next!);
+      type: SNAKE_BODY.tail,
+      posY: numberCaseVertically ~/ 2,
+      posX: 1,
+      previous: _snake.next!.next!.next!,
+    );
     _tail = _snake.next!.next!.next!.next!;
 
     /// Update the board with the snake
     _updateBoard();
   }
 
+  /// ATTENTION: This is default front movement. Don't use it for control snake
+  _snakeMoveFront(SNAKE_DIRECTION direction) {
+    switch (direction) {
+      case SNAKE_DIRECTION.left:
+        _snake.posX--;
+        break;
+      case SNAKE_DIRECTION.right:
+        _snake.posX++;
+        break;
+      case SNAKE_DIRECTION.up:
+        _snake.posY--;
+        break;
+      case SNAKE_DIRECTION.down:
+        _snake.posY++;
+        break;
+    }
+  }
+
   /// Manage the snake movement on the right
   _snakeMoveRight(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
-        _snake.posY--;
+        _snake.posX--;
         break;
       case SNAKE_DIRECTION.right:
-        _snake.posY++;
+        _snake.posX++;
         break;
       case SNAKE_DIRECTION.up:
         _snake.posX++;
         break;
       case SNAKE_DIRECTION.down:
-        _snake.posX--;
+        _snake.posX++;
         break;
     }
   }
@@ -78,28 +102,47 @@ class SnakeBoard {
   _snakeMoveLeft(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
-        _snake.posY++;
+        _snake.posX--;
         break;
       case SNAKE_DIRECTION.right:
-        _snake.posY--;
+        _snake.posX++;
         break;
       case SNAKE_DIRECTION.up:
         _snake.posX--;
         break;
       case SNAKE_DIRECTION.down:
-        _snake.posX++;
+        _snake.posX--;
         break;
     }
   }
 
-  /// Manage the snake movement on the front
-  _snakeMoveFront(SNAKE_DIRECTION direction) {
+  /// Manage the snake movement on the up
+
+  _snakeMoveUp(SNAKE_DIRECTION direction) {
     switch (direction) {
       case SNAKE_DIRECTION.left:
-        _snake.posX--;
+        _snake.posY--;
         break;
       case SNAKE_DIRECTION.right:
-        _snake.posX++;
+        _snake.posY--;
+        break;
+      case SNAKE_DIRECTION.up:
+        _snake.posY--;
+        break;
+      case SNAKE_DIRECTION.down:
+        _snake.posY++;
+        break;
+    }
+  }
+
+  /// Manage the snake movement on the down
+  _snakeMoveDown(SNAKE_DIRECTION direction) {
+    switch (direction) {
+      case SNAKE_DIRECTION.left:
+        _snake.posY++;
+        break;
+      case SNAKE_DIRECTION.right:
+        _snake.posY++;
         break;
       case SNAKE_DIRECTION.up:
         _snake.posY--;
@@ -132,11 +175,12 @@ class SnakeBoard {
     if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.food) {
       /// Add a new part of the snake if the head is on a food
       SnakePart newPart = SnakePart(
-          type: SNAKE_BODY.body,
-          posY: _snake.posY,
-          posX: _snake.posX,
-          previous: _snake,
-          next: _snake.next);
+        type: SNAKE_BODY.body,
+        posY: _snake.posY,
+        posX: _snake.posX,
+        previous: _snake,
+        next: _snake.next,
+      );
       _snake.next!.previous = newPart;
       _snake.next = newPart;
       event = GAME_EVENT.food_eaten;
@@ -153,6 +197,10 @@ class SnakeBoard {
       _snakeMoveRight(direction);
     } else if (move == SNAKE_MOVE.left) {
       _snakeMoveLeft(direction);
+    } else if (move == SNAKE_MOVE.up) {
+      _snakeMoveUp(direction);
+    } else if (move == SNAKE_MOVE.down) {
+      _snakeMoveDown(direction);
     } else {
       _snakeMoveFront(direction);
     }
@@ -198,11 +246,9 @@ class SnakeBoard {
 
     for (List<BoardCase> boardLine in _board) {
       for (BoardCase boardCase in boardLine) {
-        if (boardCase.caseType == CASE_TYPE.empty &&
-            boardCase.partSnake == null) {
+        if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
           emptyCases.add(boardCase);
-        } else if (boardCase.caseType == CASE_TYPE.food &&
-            boardCase.partSnake == null) {
+        } else if (boardCase.caseType == CASE_TYPE.food && boardCase.partSnake == null) {
           nbFood++;
         }
       }
