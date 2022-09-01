@@ -42,6 +42,9 @@ class SnakeGame extends StatefulWidget {
   final String? snakeBodyTurnImgPath;
   final String? snakeTailImgPath;
   final String? snakeFruitImgPath;
+  final String? snakeCashImgPath;
+  final String? snakeCoinImgPath;
+  final List<CASE_TYPE> foodList;
 
   SnakeGame({
     Key? key,
@@ -57,6 +60,9 @@ class SnakeGame extends StatefulWidget {
     this.snakeTailImgPath,
     this.snakeFruitImgPath,
     this.snakeHeadImgPath,
+    required this.foodList,
+    this.snakeCashImgPath,
+    this.snakeCoinImgPath,
   }) : super(
           key: key,
         ) {
@@ -85,6 +91,7 @@ class _SnakeGameState extends State<SnakeGame> {
 
     /// Init the board
     _board = SnakeBoard(
+      foodList: widget.foodList,
       numberCaseHorizontally: widget.numberCaseHorizontally,
       numberCaseVertically: widget.numberCaseVertically,
     );
@@ -123,9 +130,7 @@ class _SnakeGameState extends State<SnakeGame> {
       widget.controllerEvent?.add(event);
 
       /// Check if the game is finished
-      if (event == GAME_EVENT.win ||
-          event == GAME_EVENT.hit_his_tail ||
-          event == GAME_EVENT.out_of_map) {
+      if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
         timer?.cancel();
         timer = null;
       }
@@ -170,10 +175,17 @@ class _SnakeGameState extends State<SnakeGame> {
 
         /// Check if the case contain food
         switch (boardCase.caseType) {
-          case CASE_TYPE.food:
+          case CASE_TYPE.fruit:
             defaultImg = widget.snakeFruitImgPath == null;
-            imgIcon =
-                widget.snakeFruitImgPath ?? "assets/default_snake_fruit.png";
+            imgIcon = widget.snakeFruitImgPath ?? "assets/default_snake_fruit.png";
+            break;
+          case CASE_TYPE.cash:
+            defaultImg = widget.snakeFruitImgPath == null;
+            imgIcon = widget.snakeCashImgPath ?? "assets/default_snake_cash.png";
+            break;
+          case CASE_TYPE.coin:
+            defaultImg = widget.snakeFruitImgPath == null;
+            imgIcon = widget.snakeCoinImgPath ?? "assets/default_snake_point.png";
             break;
           default:
         }
@@ -184,30 +196,24 @@ class _SnakeGameState extends State<SnakeGame> {
           switch (boardCase.partSnake!.type) {
             case SNAKE_BODY.head:
               defaultImg = widget.snakeHeadImgPath == null;
-              imgIcon =
-                  widget.snakeHeadImgPath ?? "assets/default_snake_head.png";
+              imgIcon = widget.snakeHeadImgPath ?? "assets/default_snake_head.png";
               quarterTurns = _rotateHead(boardCase.partSnake!);
               break;
             case SNAKE_BODY.tail:
               defaultImg = widget.snakeTailImgPath == null;
-              imgIcon =
-                  widget.snakeTailImgPath ?? "assets/default_snake_tail.png";
+              imgIcon = widget.snakeTailImgPath ?? "assets/default_snake_tail.png";
               quarterTurns = _rotateTail(boardCase.partSnake!);
               break;
             default:
-              if (boardCase.partSnake!.previous!.posX ==
-                      boardCase.partSnake!.next!.posX ||
-                  boardCase.partSnake!.previous!.posY ==
-                      boardCase.partSnake!.next!.posY) {
+              if (boardCase.partSnake!.previous!.posX == boardCase.partSnake!.next!.posX ||
+                  boardCase.partSnake!.previous!.posY == boardCase.partSnake!.next!.posY) {
                 defaultImg = widget.snakeBodyImgPath == null;
                 quarterTurns = _rotateBody(boardCase.partSnake!);
-                imgIcon =
-                    widget.snakeBodyImgPath ?? "assets/default_snake_body.png";
+                imgIcon = widget.snakeBodyImgPath ?? "assets/default_snake_body.png";
               } else {
                 defaultImg = widget.snakeBodyTurnImgPath == null;
                 quarterTurns = _rotateBodyTurn(boardCase.partSnake!);
-                imgIcon = widget.snakeBodyTurnImgPath ??
-                    "assets/default_snake_turn.png";
+                imgIcon = widget.snakeBodyTurnImgPath ?? "assets/default_snake_turn.png";
               }
           }
         }
@@ -303,41 +309,32 @@ class _SnakeGameState extends State<SnakeGame> {
     SnakePart previous = partSnake.previous!;
     SnakePart next = partSnake.next!;
 
-    SNAKE_DIRECTION directionPrevious =
-        _rotateBodyTurnCheckDirection(partSnake, previous);
-    SNAKE_DIRECTION directionNext =
-        _rotateBodyTurnCheckDirection(partSnake, next);
+    SNAKE_DIRECTION directionPrevious = _rotateBodyTurnCheckDirection(partSnake, previous);
+    SNAKE_DIRECTION directionNext = _rotateBodyTurnCheckDirection(partSnake, next);
 
-    if (directionNext == SNAKE_DIRECTION.down &&
-        directionPrevious == SNAKE_DIRECTION.right) {
+    if (directionNext == SNAKE_DIRECTION.down && directionPrevious == SNAKE_DIRECTION.right) {
       return 1;
     }
-    if (directionNext == SNAKE_DIRECTION.down &&
-        directionPrevious == SNAKE_DIRECTION.left) {
+    if (directionNext == SNAKE_DIRECTION.down && directionPrevious == SNAKE_DIRECTION.left) {
       return 2;
     }
-    if (directionNext == SNAKE_DIRECTION.up &&
-        directionPrevious == SNAKE_DIRECTION.left) {
+    if (directionNext == SNAKE_DIRECTION.up && directionPrevious == SNAKE_DIRECTION.left) {
       return 3;
     }
-    if (directionNext == SNAKE_DIRECTION.left &&
-        directionPrevious == SNAKE_DIRECTION.up) {
+    if (directionNext == SNAKE_DIRECTION.left && directionPrevious == SNAKE_DIRECTION.up) {
       return 3;
     }
-    if (directionNext == SNAKE_DIRECTION.left &&
-        directionPrevious == SNAKE_DIRECTION.down) {
+    if (directionNext == SNAKE_DIRECTION.left && directionPrevious == SNAKE_DIRECTION.down) {
       return 2;
     }
-    if (directionNext == SNAKE_DIRECTION.right &&
-        directionPrevious == SNAKE_DIRECTION.down) {
+    if (directionNext == SNAKE_DIRECTION.right && directionPrevious == SNAKE_DIRECTION.down) {
       return 1;
     }
     return 0;
   }
 
   /// return the direction of a snake part to another one.
-  SNAKE_DIRECTION _rotateBodyTurnCheckDirection(
-      SnakePart partSnake, SnakePart compare) {
+  SNAKE_DIRECTION _rotateBodyTurnCheckDirection(SnakePart partSnake, SnakePart compare) {
     if (compare.posX == partSnake.posX) {
       if (compare.posY < partSnake.posY) {
         return SNAKE_DIRECTION.down;

@@ -23,6 +23,8 @@ flutter:
   assets:
     - assets/default_snake_body.png
     - assets/default_snake_fruit.png
+    - assets/default_snake_cash.png
+    - assets/default_snake_point.png
     - assets/default_snake_head.png
     - assets/default_snake_tail.png
     - assets/default_snake_turn.png

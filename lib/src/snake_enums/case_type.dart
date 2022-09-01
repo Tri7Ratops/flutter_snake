@@ -1,4 +1,6 @@
 enum CASE_TYPE {
-  food,
+  fruit,
+  cash,
+  coin,
   empty,
 }
