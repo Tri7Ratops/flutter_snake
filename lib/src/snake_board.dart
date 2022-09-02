@@ -18,10 +18,14 @@ class SnakeBoard {
 
   /// Number of case horizontally (y)
   final int numberCaseVertically;
+  int currentIndex = 0;
+
+  final List<CASE_TYPE> foodList;
 
   SnakeBoard({
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
+    required this.foodList,
   }) {
     /// Instanciate the board
     _initBoard();
@@ -172,7 +176,9 @@ class SnakeBoard {
         direction = SNAKE_DIRECTION.left;
       }
     }
-    if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.food) {
+    if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.fruit ||
+        _board[_snake.posY][_snake.posX].caseType == CASE_TYPE.cash ||
+        _board[_snake.posY][_snake.posX].caseType == CASE_TYPE.coin) {
       /// Add a new part of the snake if the head is on a food
       SnakePart newPart = SnakePart(
         type: SNAKE_BODY.body,
@@ -183,7 +189,19 @@ class SnakeBoard {
       );
       _snake.next!.previous = newPart;
       _snake.next = newPart;
-      event = GAME_EVENT.food_eaten;
+      switch (_board[_snake.posY][_snake.posX].caseType) {
+        case CASE_TYPE.fruit:
+          event = GAME_EVENT.fruit_eaten;
+          break;
+        case CASE_TYPE.cash:
+          event = GAME_EVENT.cash_eaten;
+          break;
+        case CASE_TYPE.coin:
+          event = GAME_EVENT.coin_eaten;
+          break;
+        default:
+          break;
+      }
     } else {
       /// Move all the snake depends on his previous part
       SnakePart? snakeTmp = _tail;
@@ -248,7 +266,10 @@ class SnakeBoard {
       for (BoardCase boardCase in boardLine) {
         if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
           emptyCases.add(boardCase);
-        } else if (boardCase.caseType == CASE_TYPE.food && boardCase.partSnake == null) {
+        } else if ((boardCase.caseType == CASE_TYPE.fruit ||
+                boardCase.caseType == CASE_TYPE.cash ||
+                boardCase.caseType == CASE_TYPE.coin) &&
+            boardCase.partSnake == null) {
           nbFood++;
         }
       }
@@ -256,7 +277,12 @@ class SnakeBoard {
     if (nbFood == 0) {
       /// Place a food on a empty case randomly
       var rng = new Random();
-      emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.food;
+      if (foodList.isNotEmpty && currentIndex < foodList.length) {
+        emptyCases[rng.nextInt(emptyCases.length)].caseType = foodList[currentIndex];
+        currentIndex++;
+      } else {
+        emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.fruit;
+      }
     }
     if (emptyCases.isEmpty) {
       return GAME_EVENT.win;
