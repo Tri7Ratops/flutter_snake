@@ -31,8 +31,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   StreamController<GAME_EVENT>? controller;
-  SnakeGame? snakeGame;
   List<CASE_TYPE> _enumList = [];
+  bool isPaused = true;
 
   @override
   void initState() {
@@ -42,16 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print(value.toString());
     });
     addFoods();
-    snakeGame = new SnakeGame(
-      foodList: _enumList,
-      caseWidth: 25.0,
-      numberCaseHorizontally: 14,
-      numberCaseVertically: 24,
-      controllerEvent: controller,
-      durationBetweenTicks: Duration(milliseconds: 400),
-      colorBackground1: Color(0XFF7CFC00),
-      colorBackground2: Color(0XFF32CD32),
-    );
   }
 
   List<dynamic> _foodList = [
@@ -86,27 +76,52 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final SnakeGame snakeGame = new SnakeGame(
+      isPaused: isPaused,
+      foodList: _enumList,
+      caseWidth: 25.0,
+      numberCaseHorizontally: 14,
+      numberCaseVertically: 24,
+      controllerEvent: controller,
+      durationBetweenTicks: Duration(milliseconds: 400),
+      colorBackground1: Color(0XFF7CFC00),
+      colorBackground2: Color(0XFF32CD32),
+    );
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          actions: [
+            InkWell(
+              onTap: (() {
+                setState(() {
+                  if (isPaused) {
+                    isPaused = false;
+                  } else {
+                    isPaused = true;
+                  }
+                });
+              }),
+              child: Icon(Icons.play_arrow),
+            ),
+          ],
         ),
         body: GestureDetector(
           onHorizontalDragUpdate: (details) {
             if (details.delta.dx > 0.0) {
-              snakeGame?.nextDirection = SNAKE_MOVE.right;
+              snakeGame.nextDirection = SNAKE_MOVE.right;
             } else {
-              snakeGame?.nextDirection = SNAKE_MOVE.left;
+              snakeGame.nextDirection = SNAKE_MOVE.left;
             }
           },
           onVerticalDragUpdate: (details) {
             if (details.delta.dy > 0.0) {
-              snakeGame?.nextDirection = SNAKE_MOVE.down;
+              snakeGame.nextDirection = SNAKE_MOVE.down;
             } else {
-              snakeGame?.nextDirection = SNAKE_MOVE.up;
+              snakeGame.nextDirection = SNAKE_MOVE.up;
             }
           },
-          child: snakeGame ?? Text("Not initialized"),
+          child: snakeGame,
         ),
       ),
     );

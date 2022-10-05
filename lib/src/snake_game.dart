@@ -45,6 +45,7 @@ class SnakeGame extends StatefulWidget {
   final String? snakeCashImgPath;
   final String? snakeCoinImgPath;
   final List<CASE_TYPE> foodList;
+  final bool isPaused;
 
   SnakeGame({
     Key? key,
@@ -63,6 +64,7 @@ class SnakeGame extends StatefulWidget {
     required this.foodList,
     this.snakeCashImgPath,
     this.snakeCoinImgPath,
+    this.isPaused = false,
   }) : super(
           key: key,
         ) {
@@ -108,8 +110,10 @@ class _SnakeGameState extends State<SnakeGame> {
 
     /// Defines the loop for the game
     timer = Timer.periodic(widget.durationBetweenTicks, (Timer t) {
-      controller?.add(widget.getDirection);
-      widget.nextDirection = SNAKE_MOVE.front;
+      if (!widget.isPaused) {
+        controller?.add(widget.getDirection);
+        widget.nextDirection = SNAKE_MOVE.front;
+      }
     });
   }
 
