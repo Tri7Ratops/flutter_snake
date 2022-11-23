@@ -44,6 +44,7 @@ class SnakeGame extends StatefulWidget {
   final String? snakeFruitImgPath;
   final String? snakeCashImgPath;
   final String? snakeCoinImgPath;
+  final String? snakeLavaImgPath;
   final List<CASE_TYPE> foodList;
   final bool isPaused;
 
@@ -65,6 +66,7 @@ class SnakeGame extends StatefulWidget {
     this.snakeCashImgPath,
     this.snakeCoinImgPath,
     this.isPaused = false,
+    this.snakeLavaImgPath,
   }) : super(
           key: key,
         ) {
@@ -134,7 +136,10 @@ class _SnakeGameState extends State<SnakeGame> {
       widget.controllerEvent?.add(event);
 
       /// Check if the game is finished
-      if (event == GAME_EVENT.win || event == GAME_EVENT.hit_his_tail || event == GAME_EVENT.out_of_map) {
+      if (event == GAME_EVENT.win ||
+          event == GAME_EVENT.hit_his_tail ||
+          event == GAME_EVENT.out_of_map ||
+          event == GAME_EVENT.touch_lava) {
         timer?.cancel();
         timer = null;
       }
@@ -190,6 +195,10 @@ class _SnakeGameState extends State<SnakeGame> {
           case CASE_TYPE.coin:
             defaultImg = widget.snakeFruitImgPath == null;
             imgIcon = widget.snakeCoinImgPath ?? "assets/default_snake_point.png";
+            break;
+          case CASE_TYPE.lava:
+            defaultImg = widget.snakeLavaImgPath == null;
+            imgIcon = widget.snakeLavaImgPath ?? "assets/default_snake_lava.png";
             break;
           default:
         }

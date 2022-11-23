@@ -238,6 +238,7 @@ class SnakeBoard {
   /// Update the board
   GAME_EVENT? _updateBoard() {
     bool hitHisTail = false;
+    bool touchLava = false;
     for (List<BoardCase> boardLine in _board) {
       for (BoardCase boardCase in boardLine) {
         boardCase.partSnake = null;
@@ -251,8 +252,14 @@ class SnakeBoard {
       if (snakeTmp.next == null) {
         _board[snakeTmp.posY][snakeTmp.posX].caseType = CASE_TYPE.empty;
       }
+      if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.lava) {
+        touchLava = true;
+      }
       _board[snakeTmp.posY][snakeTmp.posX].partSnake = snakeTmp;
       snakeTmp = snakeTmp.next;
+    }
+    if (touchLava) {
+      return GAME_EVENT.touch_lava;
     }
     return hitHisTail ? GAME_EVENT.hit_his_tail : _manageFood();
   }
@@ -283,7 +290,34 @@ class SnakeBoard {
       } else {
         emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.fruit;
       }
+      _manageLava();
     }
+
+    if (emptyCases.isEmpty) {
+      return GAME_EVENT.win;
+    }
+  }
+
+  _manageLava() {
+    List<BoardCase> emptyCases = [];
+    int numberLava = Random().nextInt(7);
+    int i = 0;
+
+    for (List<BoardCase> boardLine in _board) {
+      for (BoardCase boardCase in boardLine) {
+        if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
+          emptyCases.add(boardCase);
+        } else if (boardCase.caseType == CASE_TYPE.lava && boardCase.partSnake == null) {
+          boardCase.caseType = CASE_TYPE.empty;
+        }
+      }
+    }
+    do {
+      var rng = new Random();
+      emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.lava;
+      i++;
+    } while (i < numberLava);
+
     if (emptyCases.isEmpty) {
       return GAME_EVENT.win;
     }
