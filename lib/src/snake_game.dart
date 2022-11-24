@@ -163,8 +163,7 @@ class _SnakeGameState extends State<SnakeGame> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
+    return SizedBox(
       width: widget.caseWidth * widget.numberCaseHorizontally,
       height: widget.caseWidth * widget.numberCaseVertically,
       child: _printBoard(),
