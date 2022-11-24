@@ -18,14 +18,29 @@ class SnakeBoard {
 
   /// Number of case horizontally (y)
   final int numberCaseVertically;
+
+  /// is Lava (fire cell) enabled
+  final bool isLavaEnabled;
+
+  /// Limit of lava (fire cells) that can be appeared on the board
+  final int limitLavaBoard;
+
+  /// First number of food eaten cases that lava (fire cells) not appears
+  final int numberCaseNoLava;
+
   int currentIndex = 0;
 
   final List<CASE_TYPE> foodList;
+
+  int eatFoodCount = 0;
 
   SnakeBoard({
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
     required this.foodList,
+    this.isLavaEnabled = false,
+    this.limitLavaBoard = 26,
+    this.numberCaseNoLava = 3,
   }) {
     /// Instanciate the board
     _initBoard();
@@ -282,6 +297,9 @@ class SnakeBoard {
       }
     }
     if (nbFood == 0) {
+      // Increment number of foods(cash, coint, fruit) that snake eats
+      eatFoodCount++;
+
       /// Place a food on a empty case randomly
       var rng = new Random();
       if (foodList.isNotEmpty && currentIndex < foodList.length) {
@@ -290,36 +308,18 @@ class SnakeBoard {
       } else {
         emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.fruit;
       }
-      _manageLava();
-    }
-
-    if (emptyCases.isEmpty) {
-      return GAME_EVENT.win;
-    }
-  }
-
-  _manageLava() {
-    List<BoardCase> emptyCases = [];
-    int numberLava = Random().nextInt(7);
-    int i = 0;
-
-    for (List<BoardCase> boardLine in _board) {
-      for (BoardCase boardCase in boardLine) {
-        if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
-          emptyCases.add(boardCase);
-        } else if (boardCase.caseType == CASE_TYPE.lava && boardCase.partSnake == null) {
-          boardCase.caseType = CASE_TYPE.empty;
-        }
+      //
+      // Add lava(fire cell) to the board when snake eats every second type of food(cash,coin, fruit)
+      // Let the user to collect some foods(cash, coint, fruit) first
+      // Set the limit for lava (fire cell) that can be appear on the board
+      //
+      if (isLavaEnabled && eatFoodCount.isEven && eatFoodCount > numberCaseNoLava && eatFoodCount <= limitLavaBoard) {
+        emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.lava;
       }
     }
-    do {
-      var rng = new Random();
-      emptyCases[rng.nextInt(emptyCases.length)].caseType = CASE_TYPE.lava;
-      i++;
-    } while (i < numberLava);
 
     if (emptyCases.isEmpty) {
-      return GAME_EVENT.win;
+      return GAME_EVENT.hit_his_tail;
     }
   }
 

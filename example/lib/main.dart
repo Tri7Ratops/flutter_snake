@@ -83,9 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
       numberCaseHorizontally: 14,
       numberCaseVertically: 24,
       controllerEvent: controller,
-      durationBetweenTicks: Duration(milliseconds: 400),
+      durationBetweenTicks: Duration(milliseconds: 250),
       colorBackground1: Color(0XFF7CFC00),
       colorBackground2: Color(0XFF32CD32),
+      isLavaEnabled: true,
     );
     return SafeArea(
       child: Scaffold(

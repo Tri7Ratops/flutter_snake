@@ -36,6 +36,15 @@ class SnakeGame extends StatefulWidget {
   final Color colorBackground1;
   final Color colorBackground2;
 
+  /// is Lava (fire cell) enabled
+  final bool isLavaEnabled;
+
+  /// Limit of lava (fire cells) that can be appeared on the board
+  final int limitLavaBoard;
+
+  /// First number of food eaten cases that lava (fire cells) not appears
+  final int numberCaseNoLava;
+
   /// Snake image body and fruit
   final String? snakeHeadImgPath;
   final String? snakeBodyImgPath;
@@ -67,6 +76,9 @@ class SnakeGame extends StatefulWidget {
     this.snakeCoinImgPath,
     this.isPaused = false,
     this.snakeLavaImgPath,
+    this.isLavaEnabled = false,
+    this.limitLavaBoard = 26,
+    this.numberCaseNoLava = 3,
   }) : super(
           key: key,
         ) {
@@ -98,6 +110,9 @@ class _SnakeGameState extends State<SnakeGame> {
       foodList: widget.foodList,
       numberCaseHorizontally: widget.numberCaseHorizontally,
       numberCaseVertically: widget.numberCaseVertically,
+      isLavaEnabled: widget.isLavaEnabled,
+      limitLavaBoard: widget.limitLavaBoard,
+      numberCaseNoLava: widget.numberCaseNoLava,
     );
 
     /// Init the controller
