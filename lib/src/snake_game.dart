@@ -21,7 +21,13 @@ class SnakeGame extends StatefulWidget {
   double caseWidth;
 
   /// Duration between each ticks
-  final Duration durationBetweenTicks;
+  final int defaultSpeed;
+
+  /// Min snake speed
+  final int minSpeed;
+
+  /// Min snake speed
+  final int increaseSpeed;
 
   /// Number of case horizontally (x)
   final int numberCaseHorizontally;
@@ -62,7 +68,7 @@ class SnakeGame extends StatefulWidget {
     required this.caseWidth,
     required this.numberCaseHorizontally,
     required this.numberCaseVertically,
-    this.durationBetweenTicks = const Duration(milliseconds: 500),
+    this.defaultSpeed = 450,
     this.controllerEvent,
     this.colorBackground1 = Colors.greenAccent,
     this.colorBackground2 = Colors.green,
@@ -79,6 +85,8 @@ class SnakeGame extends StatefulWidget {
     this.isLavaEnabled = false,
     this.limitLavaBoard = 26,
     this.numberCaseNoLava = 3,
+    this.minSpeed = 200,
+    this.increaseSpeed = 10,
   }) : super(
           key: key,
         ) {
@@ -100,10 +108,13 @@ class _SnakeGameState extends State<SnakeGame> {
 
   /// Loop for the game
   Timer? timer;
+  late int snakeSpeed;
 
   @override
   void initState() {
     super.initState();
+
+    snakeSpeed = widget.defaultSpeed;
 
     /// Init the board
     _board = SnakeBoard(
@@ -126,7 +137,7 @@ class _SnakeGameState extends State<SnakeGame> {
     });
 
     /// Defines the loop for the game
-    timer = Timer.periodic(widget.durationBetweenTicks, (Timer t) {
+    timer = Timer.periodic(Duration(milliseconds: snakeSpeed), (Timer t) {
       if (!widget.isPaused) {
         controller?.add(widget.getDirection);
         widget.nextDirection = SNAKE_MOVE.front;
@@ -158,7 +169,22 @@ class _SnakeGameState extends State<SnakeGame> {
         timer?.cancel();
         timer = null;
       }
+      if ((event == GAME_EVENT.cash_eaten || event == GAME_EVENT.coin_eaten) && snakeSpeed > widget.minSpeed) {
+        timer?.cancel();
+        timer = null;
+        _increaseSpeed();
+      }
     }
+  }
+
+  void _increaseSpeed() {
+    snakeSpeed = snakeSpeed - widget.increaseSpeed;
+    timer = Timer.periodic(Duration(milliseconds: snakeSpeed), (Timer t) {
+      if (!widget.isPaused) {
+        controller?.add(widget.getDirection);
+        widget.nextDirection = SNAKE_MOVE.front;
+      }
+    });
   }
 
   @override
