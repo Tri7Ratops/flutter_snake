@@ -6,4 +6,5 @@ enum GAME_EVENT {
   fruit_eaten,
   cash_eaten,
   coin_eaten,
+  spin_eaten,
 }

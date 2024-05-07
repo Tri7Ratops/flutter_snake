@@ -192,6 +192,7 @@ class SnakeBoard {
       }
     }
     if (_board[_snake.posY][_snake.posX].caseType == CASE_TYPE.fruit ||
+        _board[_snake.posY][_snake.posX].caseType == CASE_TYPE.spin ||
         _board[_snake.posY][_snake.posX].caseType == CASE_TYPE.cash ||
         _board[_snake.posY][_snake.posX].caseType == CASE_TYPE.coin) {
       /// Add a new part of the snake if the head is on a food
@@ -213,6 +214,9 @@ class SnakeBoard {
           break;
         case CASE_TYPE.coin:
           event = GAME_EVENT.coin_eaten;
+          break;
+        case CASE_TYPE.spin:
+          event = GAME_EVENT.spin_eaten;
           break;
         default:
           break;
@@ -289,6 +293,7 @@ class SnakeBoard {
         if (boardCase.caseType == CASE_TYPE.empty && boardCase.partSnake == null) {
           emptyCases.add(boardCase);
         } else if ((boardCase.caseType == CASE_TYPE.fruit ||
+                boardCase.caseType == CASE_TYPE.spin ||
                 boardCase.caseType == CASE_TYPE.cash ||
                 boardCase.caseType == CASE_TYPE.coin) &&
             boardCase.partSnake == null) {

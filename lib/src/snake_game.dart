@@ -60,6 +60,7 @@ class SnakeGame extends StatefulWidget {
   final String? snakeCashImgPath;
   final String? snakeCoinImgPath;
   final String? snakeLavaImgPath;
+  final String? snakeSpinImgPath;
   final List<CASE_TYPE> foodList;
   final bool isPaused;
 
@@ -87,6 +88,7 @@ class SnakeGame extends StatefulWidget {
     this.numberCaseNoLava = 3,
     this.minSpeed = 200,
     this.increaseSpeed = 10,
+    this.snakeSpinImgPath,
   }) : super(
           key: key,
         ) {
@@ -239,6 +241,10 @@ class _SnakeGameState extends State<SnakeGame> {
           case CASE_TYPE.lava:
             defaultImg = widget.snakeLavaImgPath == null;
             imgIcon = widget.snakeLavaImgPath ?? "assets/default_snake_lava.png";
+            break;
+          case CASE_TYPE.spin:
+            defaultImg = widget.snakeSpinImgPath == null;
+            imgIcon = widget.snakeSpinImgPath ?? "assets/default_snake_point.png";
             break;
           default:
         }

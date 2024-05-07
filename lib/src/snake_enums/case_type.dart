@@ -3,5 +3,6 @@ enum CASE_TYPE {
   cash,
   coin,
   lava,
+  spin,
   empty,
 }
